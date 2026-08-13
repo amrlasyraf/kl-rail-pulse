@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KL Rail Pulse</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a23;
+    --panel-border: #223041;
+    --text: #e6edf3;
+    --text-dim: #8b98a5;
+    --accent: #3b82f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  header p { margin: 0; color: var(--text-dim); font-size: 0.85rem; }
+  main {
+    display: grid;
+    grid-template-columns: 260px 320px 1fr;
+    gap: 16px;
+    padding: 16px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .panel h2 {
+    margin: 0 0 10px;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .line-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+  }
+  .line-item:hover, .line-item.active { background: #1c2530; }
+  .swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .line-name { flex: 1; }
+  .line-count { color: var(--text-dim); font-size: 0.78rem; }
+  .station-item {
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .station-item:hover, .station-item.active { background: #1c2530; }
+  #stations-list { max-height: 70vh; overflow-y: auto; }
+  #detail-empty { color: var(--text-dim); font-size: 0.9rem; padding: 20px; text-align: center; }
+  .notice {
+    background: #2a2110;
+    border: 1px solid #4d3a12;
+    color: #f0c674;
+    font-size: 0.78rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .dep-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .dep-row:last-child { border-bottom: none; }
+  .dep-chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: #111;
+  }
+  .dep-headsign { flex: 1; font-size: 0.85rem; }
+  .dep-time { text-align: right; font-size: 0.85rem; }
+  .dep-mins { color: var(--accent); font-weight: 600; }
+  .station-title { font-size: 1.1rem; margin: 0 0 4px; }
+  .station-sub { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 12px; }
+  #status { font-size: 0.75rem; color: var(--text-dim); margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>KL Rail Pulse</h1>
+  <p>Klang Valley MRT / LRT — schedule &amp; (future) live status, built on data.gov.my GTFS</p>
+</header>
+<main>
+  <div class="panel">
+    <h2>Lines</h2>
+    <div id="lines-list">Loading…</div>
+  </div>
+  <div class="panel">
+    <h2>Stations</h2>
+    <div id="stations-list">Select a line</div>
+  </div>
+  <div class="panel">
+    <div id="detail">
+      <div id="detail-empty">Select a station to see its next scheduled departures.</div>
+    </div>
+    <div id="status"></div>
+  </div>
+</main>
+
+<script>
+const API = "";
+let lines = [];
+let activeRouteId = null;
+let activeStopId = null;
+
+async function loadLines() {
+  lines = await fetch(`${API}/api/lines`).then(r => r.json());
+  const el = document.getElementById("lines-list");
+  el.innerHTML = "";
+  for (const line of lines) {
+    const div = document.createElement("div");
+    div.className = "line-item";
+    div.dataset.routeId = line.route_id;
+    div.innerHTML = `
+      <span class="swatch" style="background:#${line.color}"></span>
+      <span class="line-name">${line.long_name}</span>
+      <span class="line-count">${line.num_stations}</span>
+    `;
+    div.onclick = () => selectLine(line.route_id);
+    el.appendChild(div);
+  }
+}
+
+async function selectLine(routeId) {
+  activeRouteId = routeId;
+  document.querySelectorAll(".line-item").forEach(el =>
+    el.classList.toggle("active", el.dataset.routeId === routeId)
+  );
+  const stations = await fetch(`${API}/api/stations?route_id=${routeId}`).then(r => r.json());
+  const el = document.getElementById("stations-list");
+  el.innerHTML = "";
+  for (const s of stations) {
+    const div = document.createElement("div");
+    div.className = "station-item";
+    div.dataset.stopId = s.stop_id;
+    div.textContent = s.name;
+    div.onclick = () => selectStation(s.stop_id);
+    el.appendChild(div);
+  }
+}
+
+async function selectStation(stopId) {
+  activeStopId = stopId;
+  document.querySelectorAll(".station-item").forEach(el =>
+    el.classList.toggle("active", el.dataset.stopId === stopId)
+  );
+  const data = await fetch(`${API}/api/stations/${stopId}/departures`).then(r => r.json());
+  renderDetail(data);
+}
+
+function renderDetail(data) {
+  const el = document.getElementById("detail");
+  const rows = data.departures.map(d => `
+    <div class="dep-row">
+      <span class="dep-chip" style="background:#${d.color}">${d.line_short_name}</span>
+      <span class="dep-headsign">${d.headsign}</span>
+      <div class="dep-time">
+        <div>${d.scheduled_time}</div>
+        <div class="dep-mins">${d.minutes_away} min</div>
+      </div>
+    </div>
+  `).join("") || `<p style="color:var(--text-dim)">No more scheduled departures today.</p>`;
+
+  el.innerHTML = `
+    <h3 class="station-title">${data.name}</h3>
+    <p class="station-sub">${data.stop_id} · server time ${data.server_time_myt} MYT</p>
+    <div class="notice">${data.note}</div>
+    ${rows}
+  `;
+}
+
+async function loadStatus() {
+  const h = await fetch(`${API}/api/health`).then(r => r.json());
+  document.getElementById("status").textContent =
+    `API healthy · server time ${h.server_time_myt}`;
+}
+
+loadLines();
+loadStatus();
+setInterval(() => { if (activeStopId) selectStation(activeStopId); }, 30000);
+</script>
+</body>
+</html>

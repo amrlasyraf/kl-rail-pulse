@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Data lake (regenerable from source APIs) and local warehouse
+data/bronze/
+data/warehouse.duckdb
+data/warehouse.duckdb.wal
+
+.env
+.DS_Store
