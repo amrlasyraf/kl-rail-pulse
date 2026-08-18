@@ -1,0 +1,14 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 880, "h": 600 },
+    { "file": "Loud.dc.html", "x": 980, "y": 0, "w": 880, "h": 600 },
+    { "file": "Dusk.dc.html", "x": 1960, "y": 0, "w": 880, "h": 600 }
+  ],
+  "annotations": [
+    { "id": "intro", "x": 0, "y": -300, "w": 640, "text": "Three directions for the advice site — same content, three personalities. The advice button works in each; click it to cycle. Pick a direction (or mix pieces) and I'll build it out." },
+    { "id": "note-quiet", "x": 0, "y": -160, "w": 320, "text": "Option A — Quiet counsel. Editorial and typography-first: advice as a considered quotation. Tradeoff: understated, little spectacle." },
+    { "id": "note-loud", "x": 980, "y": -160, "w": 320, "text": "Option B — Loud. Brutalist fortune-cookie energy: advice as a punchline you can't ignore. Tradeoff: the humor sets the tone — reads less like serious guidance." },
+    { "id": "note-dusk", "x": 1960, "y": -160, "w": 320, "text": "Option C — Dusk. Nighttime wind-down mood: soft glow, low contrast, one thought at a time. Tradeoff: reads more meditation app than utility." }
+  ],
+  "launch": { "view": "canvas" }
+}

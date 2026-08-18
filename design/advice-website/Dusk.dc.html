@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;500&amp;display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #a78bfa; }
+    a:hover { color: #c4b0ff; }
+  </style>
+</helmet>
+<div style="width: 880px; height: 600px; box-sizing: border-box; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 36px; padding: 48px; background: #0d101c; color: #e8e6f2; font-family: Sora, 'Segoe UI', Helvetica, sans-serif; overflow: hidden;">
+  <div style="position: absolute; top: 90px; left: 200px; width: 480px; height: 480px; border-radius: 50%; background: radial-gradient(circle, {{glow}} 0%, rgba(13, 16, 28, 0) 68%);"></div>
+  <div style="position: relative; font-size: 11px; font-weight: 500; letter-spacing: 0.32em; text-transform: uppercase; color: #8f8aa8;">Tonight's advice</div>
+  <div style="position: relative; font-size: 33px; font-weight: 200; line-height: 1.55; text-align: center; max-width: 640px; text-wrap: pretty;">{{advice}}</div>
+  <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+    <button onClick="{{ next }}" style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 13px 30px; background: rgba(167, 139, 250, 0.08); border: 1px solid {{accent}}; border-radius: 999px; font-family: Sora, 'Segoe UI', Helvetica, sans-serif; font-size: 14px; font-weight: 300; letter-spacing: 0.04em; color: {{accent}}; cursor: pointer;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 8.8A5.8 5.8 0 1 1 7.2 2.5a4.6 4.6 0 0 0 6.3 6.3Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"></path></svg>
+      <span>One more before bed</span>
+    </button>
+    <div style="font-size: 12px; font-weight: 300; letter-spacing: 0.1em; color: #8f8aa8;">{{num}} of {{count}}</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#a78bfa","options":["#a78bfa","#7dd3c8","#f0a6b8","#8fb8f0"],"section":"Theme"},"$preview":{"width":880,"height":600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { i: 0 };
+  }
+  renderVals() {
+    const list = [
+      "If it takes less than two minutes, do it now.",
+      "Sleep on big decisions. Act fast on small ones.",
+      "You don't have to attend every argument you're invited to.",
+      "Write it down. Your memory is a liar with good intentions.",
+      "Comparison is a tax you don't have to pay.",
+      "Ask the question. Everyone else is wondering too."
+    ];
+    const accent = this.props.accent ?? '#a78bfa';
+    const i = this.state.i % list.length;
+    return {
+      advice: list[i],
+      num: i + 1,
+      count: list.length,
+      next: () => this.setState({ i: (i + 1) % list.length }),
+      accent: accent,
+      glow: accent + '30'
+    };
+  }
+}
+</script>
+</body>
+</html>
