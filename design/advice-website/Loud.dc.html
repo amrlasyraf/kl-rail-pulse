@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=Space+Mono:wght@400;700&amp;display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #111111; }
+    a:hover { color: #6b6b6b; }
+  </style>
+</helmet>
+<div style="width: 880px; height: 600px; box-sizing: border-box; display: flex; flex-direction: column; background: #f2efe7; color: #111111; font-family: 'Space Mono', 'Courier New', monospace; overflow: hidden;">
+  <div style="background: #111111; color: #f2efe7; font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; padding: 10px 0 10px 24px; white-space: nowrap; overflow: hidden;">Free advice · no sign-up · no cookies · no catch · free advice · no sign-up · no cookies · no catch</div>
+  <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px; padding: 40px 48px;">
+    <div style="align-self: flex-start; background: #f7e017; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; padding: 6px 12px;">Today you get:</div>
+    <div style="background: #ffffff; border: 4px solid #111111; box-shadow: 12px 12px 0 #111111; padding: 36px 40px;">
+      <div style="font-family: 'Archivo Black', 'Arial Black', Arial, sans-serif; font-size: 38px; line-height: 1.15; text-transform: uppercase; letter-spacing: -0.01em;">{{advice}}</div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <button onClick="{{ next }}" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 14px 28px; background: #111111; color: #f7e017; border: 4px solid #111111; box-shadow: 8px 8px 0 #f7e017; font-family: 'Space Mono', 'Courier New', monospace; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;">
+        <span>Another one</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 9a6 6 0 1 1-1.8-4.3M15 1.5V5h-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="square"></path></svg>
+      </button>
+      <div style="font-size: 12px; letter-spacing: 0.06em;">{{num}}/{{count}} — advice is free. results not guaranteed.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":880,"height":600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { i: 0 };
+  }
+  renderVals() {
+    const list = [
+      "If it takes less than two minutes, do it now.",
+      "Sleep on big decisions. Act fast on small ones.",
+      "You don't have to attend every argument you're invited to.",
+      "Write it down. Your memory is a liar with good intentions.",
+      "Comparison is a tax you don't have to pay.",
+      "Ask the question. Everyone else is wondering too."
+    ];
+    const i = this.state.i % list.length;
+    return {
+      advice: list[i],
+      num: i + 1,
+      count: list.length,
+      next: () => this.setState({ i: (i + 1) % list.length })
+    };
+  }
+}
+</script>
+</body>
+</html>
